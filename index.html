@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0c0b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UNIV 101">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>UNIV 101 — Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0c0b14;
+  --surface:#13121f;
+  --card:#18172a;
+  --border:#262440;
+  --text:#f0eeff;
+  --muted:#8a88a8;
+  --c5:#3da9fc;
+  --c6:#a78bfa;
+  --c7:#2cb67d;
+  --c8:#f25f4c;
+  --gold:#f7a541;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+
+/* ── App Shell ── */
+#app{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+
+/* ── Top Bar ── */
+.topbar{
+  background:rgba(12,11,20,0.95);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:calc(var(--safe-top) + .6rem) 1.2rem .6rem;
+  display:flex;align-items:center;gap:.8rem;
+  flex-shrink:0;z-index:50;
+}
+.topbar-logo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;color:var(--gold);letter-spacing:-.01em;}
+.topbar-sub{font-size:.7rem;color:var(--muted);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.6rem;}
+.global-ring{position:relative;width:38px;height:38px;}
+.global-ring svg{transform:rotate(-90deg);}
+.ring-track{fill:none;stroke:var(--border);stroke-width:3;}
+.ring-fill{fill:none;stroke:var(--gold);stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .6s ease;}
+.ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;font-weight:700;color:var(--gold);}
+
+/* ── Chapter Tabs ── */
+.tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{
+  flex:1;min-width:70px;padding:.65rem .4rem .55rem;
+  font-size:.68rem;font-weight:600;color:var(--muted);
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;text-align:center;white-space:nowrap;
+  background:none;border-top:none;border-left:none;border-right:none;
+}
+.tab.active{color:var(--text);border-bottom-color:var(--tab-color,var(--gold));}
+.tab-num{display:block;font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;
+  line-height:1;margin-bottom:.15rem;}
+
+/* ── Scroll Area ── */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding:1rem 1rem calc(var(--safe-bot) + 5rem);}
+.scroll-area::-webkit-scrollbar{width:3px;}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+
+/* ── Chapter view ── */
+.chapter-view{display:none;animation:fadeUp .25s ease;}
+.chapter-view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Chapter Hero ── */
+.ch-hero{
+  border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1rem;
+  background:linear-gradient(135deg, var(--ch-dark) 0%, var(--ch-dark2) 100%);
+  border:1px solid var(--ch-color);
+  position:relative;overflow:hidden;
+}
+.ch-hero::before{
+  content:'';position:absolute;right:-20px;top:-20px;
+  width:120px;height:120px;border-radius:50%;
+  background:var(--ch-color);opacity:.07;
+}
+.ch-hero-label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ch-color);margin-bottom:.3rem;}
+.ch-hero-title{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:900;
+  line-height:1.1;color:#fff;margin-bottom:.5rem;}
+.ch-hero-meta{font-size:.75rem;color:rgba(255,255,255,.55);line-height:1.5;}
+.ch-bar-wrap{margin-top:.8rem;display:flex;align-items:center;gap:.6rem;}
+.ch-bar-track{flex:1;height:4px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;}
+.ch-bar-fill{height:100%;background:var(--ch-color);border-radius:99px;transition:width .4s ease;width:0%;}
+.ch-bar-pct{font-size:.7rem;font-weight:700;color:var(--ch-color);min-width:2rem;text-align:right;}
+
+/* ── Key Concepts Bar ── */
+.concepts{
+  background:var(--card);border:1px solid var(--border);
+  border-left:3px solid var(--ch-color);
+  border-radius:12px;padding:.9rem 1rem;margin-bottom:1rem;
+}
+.concepts-title{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ch-color);margin-bottom:.6rem;}
+.concepts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+.concept-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.45rem .6rem;font-size:.73rem;line-height:1.35;}
+.concept-chip strong{display:block;color:var(--text);font-weight:600;}
+.concept-chip span{color:var(--muted);}
+
+/* ── Section heading ── */
+.section-heading{
+  font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ch-color);margin:1.2rem 0 .5rem;padding-bottom:.3rem;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── Content Cards ── */
+.content-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:.6rem;overflow:hidden;
+}
+.card-header{
+  display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;
+  cursor:pointer;user-select:none;
+}
+.card-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--ch-color);opacity:.15;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:.85rem;position:relative;
+}
+.card-icon-inner{position:absolute;font-size:.85rem;}
+.card-icon{opacity:1;background:rgba(var(--ch-rgb),.12);}
+.card-title-wrap{flex:1;}
+.card-title{font-size:.88rem;font-weight:600;color:var(--text);}
+.card-sub{font-size:.7rem;color:var(--muted);margin-top:.1rem;}
+.card-chevron{color:var(--muted);font-size:.7rem;transition:transform .25s;flex-shrink:0;}
+.content-card.open .card-chevron{transform:rotate(180deg);}
+.card-body{display:none;padding:0 1rem .9rem;}
+.content-card.open .card-body{display:block;}
+
+/* ── Term rows ── */
+.term-row{
+  display:flex;gap:.6rem;padding:.55rem 0;
+  border-bottom:1px solid var(--border);align-items:flex-start;
+}
+.term-row:last-child{border-bottom:none;}
+.term-key{
+  font-size:.75rem;font-weight:700;color:var(--ch-color);
+  min-width:110px;max-width:110px;flex-shrink:0;line-height:1.4;padding-top:.05rem;
+}
+.term-val{font-size:.78rem;color:rgba(240,238,255,.82);line-height:1.5;}
+
+/* ── Bullet list ── */
+.blist{list-style:none;padding:0;}
+.blist li{display:flex;gap:.6rem;font-size:.78rem;color:rgba(240,238,255,.82);
+  line-height:1.5;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.blist li:last-child{border-bottom:none;}
+.blist li::before{content:'›';color:var(--ch-color);font-weight:700;flex-shrink:0;margin-top:.02rem;}
+
+/* ── Comparison table ── */
+.comp-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-top:.4rem;}
+.comp-table th{
+  background:var(--ch-color);color:#fff;
+  padding:.4rem .6rem;text-align:left;font-weight:700;font-size:.7rem;
+}
+.comp-table td{padding:.4rem .6rem;color:rgba(240,238,255,.82);vertical-align:top;line-height:1.4;}
+.comp-table tr:nth-child(even) td{background:rgba(255,255,255,.03);}
+.comp-table tr:nth-child(odd) td{background:rgba(255,255,255,.015);}
+
+/* ── Callout ── */
+.callout{
+  background:rgba(var(--ch-rgb),.08);
+  border-left:3px solid var(--ch-color);
+  border-radius:0 8px 8px 0;
+  padding:.65rem .85rem;margin:.5rem 0;
+  font-size:.78rem;font-style:italic;color:var(--text);line-height:1.5;
+}
+
+/* ── Flashcard mode ── */
+.flashcard-btn{
+  width:100%;margin-top:.8rem;padding:.6rem;
+  background:rgba(var(--ch-rgb),.12);border:1px solid var(--ch-color);
+  border-radius:10px;color:var(--ch-color);font-family:'DM Sans',sans-serif;
+  font-size:.78rem;font-weight:600;cursor:pointer;letter-spacing:.04em;
+}
+.flashcard-btn:hover{background:rgba(var(--ch-rgb),.2);}
+
+/* ── Flashcard overlay ── */
+#fc-overlay{
+  display:none;position:fixed;inset:0;
+  background:var(--bg);z-index:200;
+  flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;
+}
+#fc-overlay.show{display:flex;}
+.fc-header{
+  position:absolute;top:calc(var(--safe-top) + .8rem);left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;
+}
+.fc-close{background:var(--card);border:1px solid var(--border);color:var(--text);
+  padding:.4rem .9rem;border-radius:8px;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.fc-counter{font-size:.75rem;color:var(--muted);}
+.fc-card{
+  width:100%;max-width:380px;min-height:220px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem 1.5rem;cursor:pointer;
+  transition:transform .15s;text-align:center;
+  position:relative;overflow:hidden;
+}
+.fc-card:active{transform:scale(.97);}
+.fc-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:120px;height:120px;border-radius:50%;
+  background:var(--fc-color,var(--gold));opacity:.06;
+}
+.fc-front-label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--fc-color,var(--gold));margin-bottom:.8rem;}
+.fc-question{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;
+  color:var(--text);line-height:1.4;}
+.fc-answer{font-size:.83rem;color:rgba(240,238,255,.85);line-height:1.55;display:none;}
+.fc-card.flipped .fc-question{display:none;}
+.fc-card.flipped .fc-answer{display:block;}
+.fc-card.flipped .fc-front-label{color:var(--c7);}
+.fc-tap-hint{font-size:.68rem;color:var(--muted);margin-top:.6rem;}
+.fc-nav{display:flex;gap:1rem;margin-top:1.2rem;}
+.fc-btn{
+  flex:1;padding:.65rem;border-radius:12px;font-family:'DM Sans',sans-serif;
+  font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid;
+}
+.fc-btn.skip{background:transparent;border-color:var(--border);color:var(--muted);}
+.fc-btn.got{background:var(--c7);border-color:var(--c7);color:#fff;}
+.fc-progress{
+  width:100%;max-width:380px;margin-top:1rem;
+  height:4px;background:var(--border);border-radius:99px;overflow:hidden;
+}
+.fc-prog-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s ease;}
+
+/* ── Bottom nav ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(12,11,20,0.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  display:flex;padding:0;
+  padding-bottom:var(--safe-bot);
+  z-index:40;
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:.55rem .3rem .45rem;cursor:pointer;
+  font-size:.6rem;color:var(--muted);gap:.2rem;
+  background:none;border:none;font-family:'DM Sans',sans-serif;
+  transition:color .15s;
+}
+.bnav-item.active{color:var(--gold);}
+.bnav-icon{font-size:1.2rem;line-height:1;}
+
+/* ── Home view ── */
+#view-home{display:none;}
+#view-home.active{display:block;}
+.home-hero{
+  padding:1.5rem 0 1rem;text-align:center;
+}
+.home-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;
+  line-height:1.1;color:var(--text);}
+.home-title span{color:var(--gold);}
+.home-sub{font-size:.8rem;color:var(--muted);margin-top:.4rem;line-height:1.5;}
+.home-progress-ring{display:flex;flex-direction:column;align-items:center;margin:1.2rem 0;}
+.big-ring{position:relative;width:110px;height:110px;}
+.big-ring svg{transform:rotate(-90deg);}
+.big-ring-track{fill:none;stroke:var(--border);stroke-width:6;}
+.big-ring-fill{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset .8s ease;}
+.big-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;}
+.big-ring-pct{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;color:var(--gold);}
+.big-ring-done{font-size:.65rem;color:var(--muted);}
+.home-ring-sub{font-size:.75rem;color:var(--muted);margin-top:.5rem;}
+.chapter-cards{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.5rem;}
+.ch-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:1rem;cursor:pointer;
+  transition:transform .15s,border-color .2s;
+  position:relative;overflow:hidden;
+}
+.ch-card:active{transform:scale(.97);}
+.ch-card::after{
+  content:'';position:absolute;bottom:-15px;right:-15px;
+  width:60px;height:60px;border-radius:50%;
+  background:var(--cc);opacity:.1;
+}
+.ch-card-num{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;
+  color:var(--cc);line-height:1;margin-bottom:.3rem;}
+.ch-card-title{font-size:.75rem;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:.5rem;}
+.ch-card-bar{height:3px;background:var(--border);border-radius:99px;overflow:hidden;}
+.ch-card-bar-fill{height:100%;background:var(--cc);border-radius:99px;width:0%;transition:width .4s ease;}
+.ch-card-pct{font-size:.65rem;color:var(--muted);margin-top:.25rem;}
+.home-actions{margin-top:1rem;display:flex;flex-direction:column;gap:.6rem;}
+.action-btn{
+  width:100%;padding:.75rem 1rem;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:.6rem;
+  border:1px solid var(--border);background:var(--card);color:var(--text);
+}
+.action-btn .action-icon{font-size:1.1rem;}
+.action-btn.primary{background:var(--gold);border-color:var(--gold);color:#0c0b14;}
+
+/* ── Credit Card ── */
+.credit-card{
+  margin-top:1rem;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:1rem 1.2rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  position:relative;overflow:hidden;
+}
+.credit-card::before{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:80px;height:80px;border-radius:50%;
+  background:var(--gold);opacity:.05;
+}
+.credit-inner{flex:1;}
+.credit-made{font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.2rem;}
+.credit-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;
+  color:var(--text);line-height:1.2;margin-bottom:.35rem;}
+.credit-id{font-size:.78rem;color:var(--muted);direction:rtl;text-align:left;}
+.credit-id span{color:var(--gold);font-weight:600;font-family:'Fraunces',serif;}
+.credit-badge{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900;
+  color:var(--gold);opacity:.25;flex-shrink:0;}
+
+/* ── Search view ── */
+#view-search{display:none;}
+#view-search.active{display:block;}
+.search-wrap{position:relative;margin-bottom:1rem;}
+.search-input{
+  width:100%;padding:.75rem 1rem .75rem 2.8rem;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;
+  outline:none;
+}
+.search-input:focus{border-color:var(--gold);}
+.search-input::placeholder{color:var(--muted);}
+.search-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);
+  font-size:1rem;color:var(--muted);}
+.search-results{display:flex;flex-direction:column;gap:.5rem;}
+.search-result{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:.75rem 1rem;cursor:pointer;
+}
+.sr-chapter{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem;}
+.sr-title{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.2rem;}
+.sr-snippet{font-size:.75rem;color:var(--muted);line-height:1.4;}
+.sr-highlight{background:rgba(247,165,65,.2);color:var(--gold);border-radius:3px;padding:0 2px;}
+.search-empty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;}
+
+/* ── Congrats ── */
+#congrats{display:none;position:fixed;inset:0;background:rgba(12,11,20,.9);
+  backdrop-filter:blur(8px);align-items:center;justify-content:center;z-index:300;padding:1.5rem;}
+#congrats.show{display:flex;}
+.congrats-card{background:var(--card);border:1px solid var(--gold);border-radius:20px;
+  padding:2rem;text-align:center;width:100%;max-width:320px;
+  animation:pop .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.cg-emoji{font-size:2.8rem;}
+.cg-title{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--gold);margin:.5rem 0;}
+.cg-sub{color:var(--muted);font-size:.82rem;line-height:1.5;}
+.cg-btn{margin-top:1.2rem;width:100%;padding:.65rem;background:var(--gold);
+  border:none;border-radius:10px;font-family:'DM Sans',sans-serif;
+  font-size:.9rem;font-weight:700;color:#0c0b14;cursor:pointer;}
+
+/* ── Install toast ── */
+#install-toast{
+  display:none;position:fixed;bottom:calc(var(--safe-bot) + 70px);left:1rem;right:1rem;
+  background:var(--card);border:1px solid var(--gold);border-radius:14px;
+  padding:.9rem 1rem;z-index:100;animation:slideUp .3s ease;
+}
+#install-toast.show{display:flex;align-items:center;gap:.8rem;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast-text{flex:1;font-size:.8rem;color:var(--text);line-height:1.4;}
+.toast-text strong{color:var(--gold);}
+.toast-btn{background:var(--gold);color:#0c0b14;border:none;border-radius:8px;
+  padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;}
+.toast-close{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:.2rem;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-logo">UNIV 101</div>
+      <div class="topbar-sub">Revision App</div>
+    </div>
+    <div class="topbar-right">
+      <div class="global-ring">
+        <svg viewBox="0 0 38 38" width="38" height="38">
+          <circle class="ring-track" cx="19" cy="19" r="16"/>
+          <circle class="ring-fill" id="globalRing" cx="19" cy="19" r="16"
+            style="stroke-dasharray:100.53;stroke-dashoffset:100.53"/>
+        </svg>
+        <div class="ring-label" id="globalPct">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab bar (chapters only) -->
+  <div class="tabs" id="chapterTabs" style="display:none;">
+    <button class="tab" data-ch="5" style="--tab-color:var(--c5)" onclick="showChapter(5)">
+      <span class="tab-num">5</span>Reading
+    </button>
+    <button class="tab" data-ch="6" style="--tab-color:var(--c6)" onclick="showChapter(6)">
+      <span class="tab-num">6</span>Thinking
+    </button>
+    <button class="tab" data-ch="7" style="--tab-color:var(--c7)" onclick="showChapter(7)">
+      <span class="tab-num">7</span>Health
+    </button>
+    <button class="tab" data-ch="8" style="--tab-color:var(--c8)" onclick="showChapter(8)">
+      <span class="tab-num">8</span>Tests
+    </button>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area" id="scrollArea">
+
+    <!-- HOME VIEW -->
+    <div id="view-home" class="active">
+      <div class="home-hero">
+        <div class="home-title">UNIV 101<br><span>Revision</span></div>
+        <div class="home-sub">Chapters 5–8 · All content from your slides</div>
+      </div>
+      <div class="home-progress-ring">
+        <div class="big-ring">
+          <svg viewBox="0 0 100 100" width="110" height="110">
+            <circle class="big-ring-track" cx="50" cy="50" r="45"/>
+            <circle class="big-ring-fill" id="bigRingFill" cx="50" cy="50" r="45"/>
+          </svg>
+          <div class="big-ring-label">
+            <div class="big-ring-pct" id="bigRingPct">0%</div>
+            <div class="big-ring-done" id="bigRingDone">0 / 0</div>
+          </div>
+        </div>
+        <div class="home-ring-sub">Overall completion</div>
+      </div>
+      <div class="chapter-cards">
+        <div class="ch-card" style="--cc:var(--c5)" onclick="switchView('chapters');showChapter(5)">
+          <div class="ch-card-num">5</div>
+          <div class="ch-card-title">Reading, Research &amp; Writing</div>
+          <div class="ch-card-bar"><div class="ch-card-bar-fill" id="home-bar-5"></div></div>
+          <div class="ch-card-pct" id="home-pct-5">0%</div>
+        </div>
+        <div class="ch-card" style="--cc:var(--c6)" onclick="switchView('chapters');showChapter(6)">
+          <div class="ch-card-num">6</div>
+          <div class="ch-card-title">Critical, Creative &amp; Practical Thinking</div>
+          <div class="ch-card-bar"><div class="ch-card-bar-fill" id="home-bar-6"></div></div>
+          <div class="ch-card-pct" id="home-pct-6">0%</div>
+        </div>
+        <div class="ch-card" style="--cc:var(--c7)" onclick="switchView('chapters');showChapter(7)">
+          <div class="ch-card-num">7</div>
+          <div class="ch-card-title">Physical Health &amp; Wellbeing</div>
+          <div class="ch-card-bar"><div class="ch-card-bar-fill" id="home-bar-7"></div></div>
+          <div class="ch-card-pct" id="home-pct-7">0%</div>
+        </div>
+        <div class="ch-card" style="--cc:var(--c8)" onclick="switchView('chapters');showChapter(8)">
+          <div class="ch-card-num">8</div>
+          <div class="ch-card-title">Test Performance</div>
+          <div class="ch-card-bar"><div class="ch-card-bar-fill" id="home-bar-8"></div></div>
+          <div class="ch-card-pct" id="home-pct-8">0%</div>
+        </div>
+      </div>
+      <div class="home-actions" style="margin-top:1.2rem;">
+        <button class="action-btn primary" onclick="startFlashcards()">
+          <span class="action-icon">🃏</span> Start Flashcard Session (All Chapters)
+        </button>
+        <button class="action-btn" onclick="resetProgress()">
+          <span class="action-icon">↺</span> Reset All Progress
+        </button>
+      </div>
+      <div class="credit-card">
+        <div class="credit-inner">
+          <div class="credit-made">Made by</div>
+          <div class="credit-name">Abdulla Mohammed H Almuhanadi</div>
+          <div class="credit-id" dir="rtl">رقم القيد: <span>202504450</span></div>
+        </div>
+        <div class="credit-badge">UNIV 101</div>
+      </div>
+    </div>
+
+    <!-- CHAPTER VIEWS -->
+    <div id="view-chapters" style="display:none;">
+      <div id="ch-5" class="chapter-view"></div>
+      <div id="ch-6" class="chapter-view"></div>
+      <div id="ch-7" class="chapter-view"></div>
+      <div id="ch-8" class="chapter-view"></div>
+    </div>
+
+    <!-- SEARCH VIEW -->
+    <div id="view-search">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="search" placeholder="Search terms, concepts…" id="searchInput" oninput="doSearch(this.value)">
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-empty">Type to search across all chapters</div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="bnav-item active" id="bnav-home" onclick="switchView('home')">
+      <span class="bnav-icon">🏠</span>Home
+    </button>
+    <button class="bnav-item" id="bnav-chapters" onclick="switchView('chapters')">
+      <span class="bnav-icon">📖</span>Chapters
+    </button>
+    <button class="bnav-item" id="bnav-flashcards" onclick="startFlashcards()">
+      <span class="bnav-icon">🃏</span>Flashcards
+    </button>
+    <button class="bnav-item" id="bnav-search" onclick="switchView('search')">
+      <span class="bnav-icon">🔍</span>Search
+    </button>
+  </nav>
+</div>
+
+<!-- Flashcard Overlay -->
+<div id="fc-overlay">
+  <div class="fc-header">
+    <button class="fc-close" onclick="closeFlashcards()">✕ Close</button>
+    <div class="fc-counter" id="fcCounter">1 / 0</div>
+  </div>
+  <div class="fc-card" id="fcCard" onclick="flipCard()">
+    <div class="fc-front-label" id="fcLabel">Question</div>
+    <div class="fc-question" id="fcQ">—</div>
+    <div class="fc-answer" id="fcA">—</div>
+  </div>
+  <div class="fc-tap-hint" id="fcHint">Tap card to reveal answer</div>
+  <div class="fc-nav">
+    <button class="fc-btn skip" onclick="nextCard(false)">Skip ›</button>
+    <button class="fc-btn got" onclick="nextCard(true)">Got it ✓</button>
+  </div>
+  <div class="fc-progress"><div class="fc-prog-fill" id="fcProgFill"></div></div>
+</div>
+
+<!-- Congrats -->
+<div id="congrats">
+  <div class="congrats-card">
+    <div class="cg-emoji">🎓</div>
+    <div class="cg-title">All Done!</div>
+    <p class="cg-sub">You've completed every topic across all 4 chapters. You're ready for your exam!</p>
+    <button class="cg-btn" onclick="document.getElementById('congrats').classList.remove('show')">Let's go! 🚀</button>
+  </div>
+</div>
+
+<!-- Install toast -->
+<div id="install-toast">
+  <div class="toast-text"><strong>Add to Home Screen</strong><br>Study offline, anytime.</div>
+  <button class="toast-btn" id="installBtn">Install</button>
+  <button class="toast-close" onclick="document.getElementById('install-toast').classList.remove('show')">✕</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA — All 4 chapters
+// ══════════════════════════════════════════════════════════
+const CHAPTERS = {
+  5: {
+    color:'#3da9fc', rgb:'61,169,252',
+    dark:'#071828', dark2:'#0a2035',
+    label:'Chapter 5',
+    title:'Reading, Research & Writing',
+    meta:'SQ3R · Bloom\'s Taxonomy · CARS Test · Writing Process · Plagiarism',
+    concepts:[
+      {h:'SQ3R',b:'Survey→Question→Read→Recite→Review'},
+      {h:'CARS Test',b:'Credibility·Accuracy·Reasonableness·Support'},
+      {h:'Bloom\'s Taxonomy',b:'6 levels of questioning (Knowledge→Evaluation)'},
+      {h:'3 Reading Purposes',b:'Understanding · Analytical Evaluation · Practical Application'},
+    ],
+    sections:[
+      {icon:'📖', title:'Reading — Definition & Comprehension', sub:'4 factors, 3 purposes', items:[
+        {type:'term', key:'Reading (Johnson, 2008)', val:'A practice of using text to create meanings. An interactive model of communication where the author conveys ideas and requires your engagement — true learning emerges from this interaction.'},
+        {type:'term', key:'4 Comprehension Factors', val:'1. Know Why You Are Reading (purpose) · 2. Choose When and Where (environment) · 3. Manage Heavy Workloads (priorities, schedule, vocabulary) · 4. Manage Distractions (internal: hunger/restlessness; external: noise/technology)'},
+        {type:'callout', val:'Purpose of reading: For Understanding (concepts & details) · For Analytical Evaluation (causes, arguments, assumptions) · For Practical Application (achieve a specific goal)'},
+      ]},
+      {icon:'📐', title:'SQ3R Reading System', sub:'All 5 steps', items:[
+        {type:'term', key:'Step 1 — Survey', val:'Front matter (TOC, chapter titles), chapter elements (headings, subheadings, boxes), back matter (glossary, bibliography).'},
+        {type:'term', key:'Step 2 — Question', val:'Ask what you already know. Write questions linked to chapter headings. Use Bloom\'s Taxonomy to generate questions at different levels.'},
+        {type:'term', key:'Step 3 — Read', val:'Focus on survey key points and Q-stage questions. Annotate and highlight. Develop a highlighting system. Avoid overmarking. Mark carefully in rented books.'},
+        {type:'term', key:'Step 4 — Recite', val:'After each section: say answers aloud, speak them silently, "teach" them to someone, or write them in note form. Speaking/writing anchors material in the brain.'},
+        {type:'term', key:'Step 5 — Review', val:'Review early and often in the days and weeks after reading. Reviewing the same material over several short sessions helps identify knowledge gaps.'},
+      ]},
+      {icon:'🧠', title:"Bloom's Taxonomy", sub:'6 levels of thinking', items:[
+        {type:'table', headers:['Level','Name','What it asks'],
+          rows:[
+            ['1','Knowledge','Memorise (remember) words and ideas'],
+            ['2','Understanding','Explain ideas in your own way'],
+            ['3','Application','Apply what you have learned to new situations'],
+            ['4','Analysis','Analyse information; study similarities and differences'],
+            ['5','Synthesis','Combine information together (constructing ideas)'],
+            ['6','Evaluation','Make decisions about different ideas and their validity'],
+          ]},
+        {type:'callout', val:'Developed by educational psychologist Benjamin Bloom. Different question types require different levels of effort and thinking.'},
+      ]},
+      {icon:'🔍', title:'Critical Thinking & Research', sub:'Evaluate, CARS Test, sources', items:[
+        {type:'term', key:'Critical Reading', val:'A process of investigation and inquiry: monitor → discover → classify → find links → judge importance. Gives ability to focus on the most important material.'},
+        {type:'term', key:'CARS Test (Robert Harris)', val:'Credibility (author qualifications, quality control) · Accuracy (timely, comprehensive, appropriate audience) · Reasonableness (fair, balanced, objective) · Support (verifiable, externally consistent)'},
+        {type:'term', key:'Primary Sources', val:'Original, untranslated documents or works — letters, financial documents, photographs, maps, journals, articles, audio/video recordings, scientific studies, textbooks.'},
+        {type:'term', key:'Secondary Sources', val:'Authors\' interpretations of other primary source documents.'},
+        {type:'callout', val:'Best approach: Combine internet + library. Use the internet to identify documents, then read printed versions when available.'},
+      ]},
+      {icon:'✍️', title:'The Writing Process', sub:'Planning → Plagiarism → Citation', items:[
+        {type:'term', key:'1 — Planning', val:'Think about logistics (time, research depth). Brainstorm (freewriting). Ask journalist questions: WHO, WHAT, WHY, WHEN, HOW. Conduct research and take notes.'},
+        {type:'term', key:'2 — Drafting', val:'Write your first draft following the planned structure.'},
+        {type:'term', key:'3 — Revising & Editing', val:'Does it fulfil requirements? Prove thesis? Develop ideas with examples? Engaging intro? Organised body? Logical transitions? Clear style? Natural conclusion?'},
+        {type:'term', key:'4 — Plagiarism', val:'Using someone\'s work without proper credit. Quotation = exact words in quotes + reference. Paraphrasing = same idea in YOUR own words, still cite the source.'},
+        {type:'term', key:'5 — Citation', val:'MLA = Humanities (history, literature, arts, philosophy). APA = Social/Behavioural Sciences (psychology, sociology, business, nursing, criminology, social work).'},
+      ]},
+    ]
+  },
+  6: {
+    color:'#a78bfa', rgb:'167,139,250',
+    dark:'#1a0e3a', dark2:'#220f4a',
+    label:'Chapter 6',
+    title:'Critical, Creative & Practical Thinking',
+    meta:'Brain Biology · Metacognition · Analytical · Creative · Practical · Problem Solving',
+    concepts:[
+      {h:'Metacognition',b:'"Thinking about thinking / knowing how you know"'},
+      {h:'3 Thinking Types',b:'Analytical · Creative · Practical'},
+      {h:'7-Step Framework',b:'Identify→Analyse→Create→Evaluate→Implement→Re-evaluate→Apply'},
+      {h:'Executive Function',b:'Prefrontal cortex development: ages 18–25'},
+    ],
+    sections:[
+      {icon:'🧬', title:'Brain, Learning & Executive Function', sub:'How learning changes the brain', items:[
+        {type:'term', key:'How Learning Works', val:'Learning → neurons connect to new neurons → brain shapes change. Repeating something strengthens cell connections, enabling electrical impulses to move more quickly and easily.'},
+        {type:'term', key:'Executive Function', val:'Controlled by the brain\'s prefrontal cortex — undergoes its last and most comprehensive development from around ages 18–25. Allows perceiving future consequences, weighing pros/cons, and taking calculated risks.'},
+        {type:'callout', val:'"With the risk of efforts comes the reward of positive change." The entire brain progresses to become a faster and more sophisticated organ during early adulthood.'},
+      ]},
+      {icon:'💭', title:'Metacognition', sub:'Thinking about thinking', items:[
+        {type:'term', key:'Metacognition', val:'"Thinking about thinking" or "knowing how you know," including taking action based on what you have learned. Foundation for self-knowledge and self-management. Essential for successful lifelong learning.'},
+        {type:'term', key:'Thinking = Questioning', val:'1. Know WHY you question (ask useful questions) · 2. Question in different ways (analyse, create, practise) · 3. WANT to question — want to think.'},
+      ]},
+      {icon:'🔬', title:'Analytical (Critical) Thinking', sub:'4-step process, fact vs opinion', items:[
+        {type:'term', key:'Definition', val:'Process of gathering information, breaking it into parts, examining and evaluating those parts, and making connections — for understanding, solving problems, or making decisions.'},
+        {type:'term', key:'Step 1 — Gather', val:'Analyse amount of information needed, determine collection time, assess relevance to the topic.'},
+        {type:'term', key:'Step 2 — Break into Parts', val:'Identify the main idea (argument/point of view) and the evidence (reasons/supporting details).'},
+        {type:'term', key:'Step 3 — Examine & Evaluate', val:'Set aside personal biases. Ask: Are there supporting examples? Is it fact or opinion? Is there cause-effect logic? Is the evidence biased?'},
+        {type:'term', key:'Step 4 — Make Connections', val:'Evaluate whether information is important, relevant, strong or weak — and explain why.'},
+        {type:'callout', val:'Fact vs Opinion: Fact = verifiable ("lunar eclipse on Nov 30, 2020"). Opinion = subjective ("my mother\'s cooking is the best in the world").'},
+      ]},
+      {icon:'💡', title:'Creative Thinking', sub:'5 ingredients, 3 sources', items:[
+        {type:'term', key:'Definition', val:'To generate new ideas that promote useful change — from combining existing elements innovatively, creating analogies from how things are related, or pondering longstanding problems.'},
+        {type:'bullets', vals:[
+          'Belief that you can develop creativity',
+          'Receptiveness to new ideas',
+          'Comfort with time alone',
+          'Risk-taking and hard work',
+          'Acceptance of mistakes as part of the process',
+        ]},
+        {type:'callout', val:'5 Ingredients of Creativity — a mindset "recipe" that promotes creative thinking.'},
+      ]},
+      {icon:'⚙️', title:'Practical Thinking', sub:'Common sense + Emotional Intelligence', items:[
+        {type:'term', key:'Definition', val:'Also called common sense, street smarts, or sound judgment. How you adapt to your environment (people and circumstances), or shape/change it to suit you, in order to pursue important goals. Practical thinking = ACTION.'},
+        {type:'term', key:'Emotional Intelligence (4 parts)', val:'Receiving emotion · Thinking about emotions · Understanding emotions · Managing emotions. Built through experience and enhances success.'},
+      ]},
+      {icon:'⚖️', title:'Problem Solving vs Decision Making', sub:'7-step framework for both', items:[
+        {type:'table', headers:['Step','Problem Solving','Decision Making'],
+          rows:[
+            ['1 — Identify','Define the problem: what is happening and what caused it?','Define the decision: determine your goal/need'],
+            ['2 — Analyse','Collect info, verify facts, consider viewpoints and assumptions','Study needs and motives; prioritise realistically'],
+            ['3 — Create','Generate possible solutions using creative thinking','Name/find different options using creative questioning'],
+            ['4 — Evaluate','List pros and cons of each solution; choose the best','List advantages and disadvantages; select the best option'],
+            ['5 — Implement','Start implementing the solution; be flexible','Act on your decision; use practical strategies'],
+            ['6 — Re-evaluate','Evaluate the success — look at effects of what you did','Check whether the decision achieved what you hoped'],
+            ['7 — Apply','Use this solution or a better one next time','Choose this option or a better one for similar decisions'],
+          ]},
+        {type:'callout', val:'Successful problem solvers and decision-makers combine analytical, creative, AND practical thinking skills together.'},
+      ]},
+    ]
+  },
+  7: {
+    color:'#2cb67d', rgb:'44,182,125',
+    dark:'#071a10', dark2:'#0a2418',
+    label:'Chapter 7',
+    title:'Physical Health & Wellbeing',
+    meta:'Stress · Nutrition · Exercise · Sleep · Mental Health · Eating Disorders',
+    concepts:[
+      {h:'Health ↔ Stress',b:'More stress = worse health. Better health = more manageable stress'},
+      {h:'3 Physical Pillars',b:'Nutrition · Exercise (3 types) · Sleep'},
+      {h:'41% Stat',b:'~41% of university students experience moderate–severe depression'},
+      {h:'4 Anxiety Types',b:'GAD · Panic Disorder · PTSD · Social Phobia (SAD)'},
+    ],
+    sections:[
+      {icon:'😰', title:'Health & Stress Management', sub:'2 pathways, the cycle', items:[
+        {type:'callout', val:'"The more stress there is, the worse health becomes. The better health becomes, the more manageable stress becomes."'},
+        {type:'term', key:'Pathway 1 — Endocrine', val:'Stress releases adrenaline and cortisol. Chronically elevated levels weaken the immune system, increase inflammation, and cause conditions such as arthritis.'},
+        {type:'term', key:'Pathway 2 — Harmful Habits', val:'Excessive stress drives overeating, lack of sleep, and avoidance of physical activity — providing temporary relief but causing long-term harm.'},
+      ]},
+      {icon:'🥗', title:'Physical Health — Nutrition', sub:'Eating habits & goals', items:[
+        {type:'term', key:'4 Nutrition Goals', val:'1. Evaluate your eating habits · 2. Eat a variety of foods · 3. Understand the effects of obesity · 4. Aim for your ideal weight. Healthy eating requires balance (variety) and moderation (reasonable amounts).'},
+        {type:'bullets', vals:[
+          'Vary your diet: focus on local and organic fruits and vegetables',
+          'Choose foods that do not contain high levels of fat',
+          'Replace sugary snacks with fresh or dried fruit',
+          'Keep healthy meals within easy reach to avoid unhealthy options',
+          'Try to limit your intake of soft drinks',
+          'Replace stress-induced eating with other activities',
+        ]},
+      ]},
+      {icon:'🏃', title:'Physical Health — Exercise & Sleep', sub:'3 training types, Dr. Jacobs tips', items:[
+        {type:'term', key:'3 Training Types', val:'1. Cardiovascular/endurance · 2. Strength/resistance · 3. Flexibility/stretching — diversify your training to include all three.'},
+        {type:'term', key:'Sleep Tips (Dr. Gregg Jacobs)', val:'1. Reduce caffeine · 2. Exercise regularly · 3. Take a short nap when needed · 4. Adhere to fixed sleep and wake-up times · 5. Engage in calm activities before bedtime · 6. Keep sleeping environment comfortable and quiet.'},
+        {type:'callout', val:'Signs of sleep deprivation: feeling groggy in the morning, falling asleep during lectures, relying on caffeine to get through the day.'},
+      ]},
+      {icon:'🧠', title:'Mental Health — Depression & Anxiety', sub:'Definitions, types, the 41% stat', items:[
+        {type:'term', key:'Depression', val:'Persistent negative mood + loss of interest or pleasure, with cognitive, behavioural, and physical changes lasting at least 2 weeks. ~41% of university students may experience moderate-to-severe depression. Treatable — requires medical/psychological evaluation.'},
+        {type:'table', headers:['Anxiety Type','Description'],
+          rows:[
+            ['GAD (Generalised Anxiety Disorder)','Near-constant anxiety not linked to a specific cause; difficult to control'],
+            ['Panic Disorder','Sudden panic attacks with physical symptoms: increased heart rate, breathing, dizziness, pessimistic feeling'],
+            ['PTSD','Reliving traumatic events with isolation and detachment; common among war soldiers and survivors of attacks'],
+            ['Social Phobia (SAD)','Intense fear of social situations or performing in front of others'],
+          ]},
+      ]},
+      {icon:'🍽️', title:'Eating Disorders', sub:'Anorexia · Bulimia · Binge Eating', items:[
+        {type:'table', headers:['Disorder','Key Features','Compensatory Behaviour'],
+          rows:[
+            ['Anorexia Nervosa','Refusal to eat / extreme restriction; excessive fear of weight gain; distorted body image; perfectionism and desire for control','Fasting, excessive exercise, self-induced vomiting, laxatives/diuretics → organ failure'],
+            ['Bulimia Nervosa','Recurrent binge episodes; intense guilt afterward; eating used to relieve psychological pain; destructive binge-regret-compensate cycle','Self-induced vomiting, laxatives, excessive exercise, fasting'],
+            ['Binge Eating (Most Common)','Frequent episodes of eating large quantities quickly and secretly; loss of control; extreme fullness; shame afterward','No compensatory behaviour (unlike bulimia) → weight gain and obesity'],
+          ]},
+      ]},
+      {icon:'🧘', title:'Mental Meditation — 4 Relaxation Steps', sub:'Focus & stability', items:[
+        {type:'bullets', vals:[
+          'Choose a quiet time and comfortable, private place; set your phone aside',
+          'Sit comfortably on a cushion or chair',
+          'Place your hands on your knees with palms facing up; close your eyes',
+          'Breathe deeply through your nose; focus on the sound of your breath',
+        ]},
+        {type:'callout', val:'"Relaxation is not a luxury, but rather the foundation of balanced health and a clearer mind." — Health is a fundamental requirement for academic and career success.'},
+      ]},
+    ]
+  },
+  8: {
+    color:'#f25f4c', rgb:'242,95,76',
+    dark:'#2a0a08', dark2:'#380e0b',
+    label:'Chapter 8',
+    title:'Test Performance',
+    meta:'Test Types · Strategies · Test Anxiety · Study Techniques · Academic Integrity',
+    concepts:[
+      {h:'3 Anxiety Types',b:'Cognitive · Behavioural · Physiological'},
+      {h:'7 Study Techniques',b:'Pomodoro · Spaced Repetition · Active Recall · Memory Palace · Feynman · Mind Maps · Storytelling'},
+      {h:'Before the Exam',b:'Study early · sleep · arrive early · breathe'},
+      {h:'Academic Integrity',b:'Exam = learning tool, not just a grade'},
+    ],
+    sections:[
+      {icon:'📋', title:'Test Definition & Qualities', sub:'What makes a good test', items:[
+        {type:'term', key:'Definition', val:'An educational or psychological measurement tool to collect accurate and objective data on performance in knowledge, skills, abilities, attitudes, or traits — for the purpose of evaluation, diagnosis, prediction, and educational or professional decision-making.'},
+        {type:'table', headers:['Quality','Meaning'],
+          rows:[
+            ['Honesty (Validity)','Tests what it claims to test'],
+            ['Consistency (Reliability)','Similar score if retaken at same level'],
+            ['Objectivity','One correct answer regardless of marker'],
+            ['Clarity','Written simply and without complication'],
+            ['Comprehensiveness','Questions from all explained material'],
+            ['Graded in Difficulty','Easy → Medium → Difficult'],
+            ['Fairness','All students take same test at same time'],
+            ['Ability to Distinguish','Prepared student scores higher'],
+          ]},
+      ]},
+      {icon:'📊', title:'Types of Tests', sub:'5 by purpose + 5 by format', items:[
+        {type:'table', headers:['Type','Objective'],
+          rows:[
+            ['Diagnostic','Determine initial level; identify strengths/weaknesses before teaching'],
+            ['Formative','Monitor progress during learning; provide feedback'],
+            ['Quizzes','Quick comprehension check; promote continuous review'],
+            ['Midterm Exams','Assess level mid-semester for early improvement'],
+            ['Final Exams','Measure overall learning outcomes at end of semester'],
+            ['Objective Tests (MCQ/T-F)','Measure knowledge accurately, objectively, and quickly'],
+            ['Essay Tests','Measure analytical thinking, organisation, self-expression'],
+            ['Practical/Performance','Assess practical skills and performance'],
+            ['Online/Computer-Based','Flexible, rapid assessment using technology'],
+            ['Standardised Tests','Compare performance according to standardised criteria'],
+          ]},
+      ]},
+      {icon:'📝', title:'Answering Test Questions', sub:'Objective types + general rules', items:[
+        {type:'term', key:'Multiple Choice', val:'Read all options. Eliminate incorrect ones. Think of the answer before looking at options. Underline key phrases. Only change your answer if you are SURE.'},
+        {type:'term', key:'True or False', val:'Read every word carefully to avoid jumping to incorrect conclusions. Make sure you understand the instructions.'},
+        {type:'term', key:'Matching Questions', val:'Always start with the column that has the LARGEST number of entries. Start with matches you know, connect with a pencil. Deal with uncertain ones last. Be logical.'},
+        {type:'term', key:'Fill-in-the-Blank', val:'Note the length and number of spaces. If more than one space with a large gap, deal with each separately. When unsure, you should guess.'},
+        {type:'callout', val:'General rules: Read ALL questions first · start easy · manage time · answer only what\'s asked · use examples · review before submitting · stay calm.'},
+      ]},
+      {icon:'😟', title:'Test Anxiety', sub:'3 types + before/during strategies', items:[
+        {type:'term', key:'Definition', val:'A temporary psychological and emotional state of tension, fear, and pressure before, during, or after a test due to anxiety about performance, failure, or the evaluation of others. May negatively affect concentration, memory, and decision-making even when academically prepared.'},
+        {type:'table', headers:['Type','Common Symptoms'],
+          rows:[
+            ['Cognitive','Constantly comparing to others; mental confusion; fear of failure; negative thoughts about self and past performance'],
+            ['Behavioural','Excessive fear; depression or sadness; self-blame; anger toward oneself/teacher; extreme self-doubt; inability to recover'],
+            ['Physiological','Increased heart rate; excessive sweating; upset stomach/nausea; trembling or muscle tension; headache/dizziness; dry mouth'],
+          ]},
+        {type:'term', key:'Before the Test (key strategies)', val:'Study early and review frequently · group study · detailed notes · enough sleep · healthy nutrition · arrive early · practise breathing/meditation · challenge yourself without striving for perfection.'},
+        {type:'term', key:'During the Test (key strategies)', val:'Read carefully, follow instructions · manage time · start easy · mark uncertain questions · ignore early finishers · review before submitting.'},
+      ]},
+      {icon:'⚡', title:'Study Techniques', sub:'7 global methods', items:[
+        {type:'term', key:'1. Pomodoro Technique', val:'Francesco Cirillo. 25 min focused work → 5 min break → after 4 rounds → 20–30 min long break. Benefits: increased focus, less procrastination, less mental fatigue, better time management.'},
+        {type:'term', key:'2. Spaced Repetition', val:'Review at intervals: 10 min → 1 day → 1 week → 1 month. Use Anki or Quizlet. Fixes information in long-term memory.'},
+        {type:'term', key:'3. Active Recall', val:'Recall from memory instead of re-reading. Methods: try to remember after closing the book, write/say what you recalled, answer self-quizzes, explain aloud to yourself or someone.'},
+        {type:'term', key:'4. Memory Palace', val:'Use spatial imagination to store information in familiar places in your mind. Link each piece to a strong mental image at a fixed, sequential point. Retrieve by mentally navigating between places in order.'},
+        {type:'term', key:'5. Feynman Technique', val:'Explain information as if to a small child. Identify weaknesses/unclear parts. Refer to source to correct and fill gaps. Re-explain in simpler terms. Reveals your true level of understanding.'},
+        {type:'term', key:'6. Mind Maps', val:'Write the main topic in the centre. Draw branches with sub-ideas using colours and drawings. Use arrows, symbols, and icons to show relationships between ideas.'},
+        {type:'term', key:'7. Storytelling Technique', val:'Transform dry information into a coherent story with events, characters, and clear sequence. The brain reacts more naturally to stories than to abstract facts — making content easier to remember.'},
+      ]},
+      {icon:'🎓', title:'Academic Integrity', sub:'5 pillars — value not just rules', items:[
+        {type:'term', key:'As a Value', val:'An internal ethical commitment. An honest student sees an exam as an opportunity to determine their true level — not a challenge to overcome at any cost.'},
+        {type:'term', key:'Integrity & Learning', val:'Test results become a true indicator of understanding. Mistakes become a learning tool. Cheating creates knowledge gaps that accumulate and appear in more advanced courses.'},
+        {type:'term', key:'Integrity & Anxiety', val:'Poor preparation + grade pressure + fear of failure = fertile environment for violations. Good preparation + clear expectations = greatly reduces likelihood of cheating. The more prepared, the more honest.'},
+        {type:'term', key:'Integrity & Responsibility', val:'Reflects: taking responsibility for your own learning, respecting your effort and others\', understanding that a degree is not more important than building knowledge and skills.'},
+        {type:'term', key:'Integrity & Professional Life', val:'Those who cheat in tests may later transfer the same behaviour to the work environment and decision-making. Academic integrity is early training in professional integrity.'},
+        {type:'callout', val:'"The exam is not a battleground — it is a space for measuring growth, a tool for development, and a mirror for real learning. Academic integrity means: I accept my result and work on improving myself — NOT on deceiving the system."'},
+      ]},
+    ]
+  }
+};
+
+// ── Flashcards data ──
+const FLASHCARDS = [
+  {ch:5,col:'#3da9fc',q:'What is the definition of "reading" according to Johnson (2008)?',a:'A practice of using text to create meanings — an interactive model of communication requiring engagement with the author\'s ideas. True learning emerges from this interaction.'},
+  {ch:5,col:'#3da9fc',q:'Name the 5 steps of SQ3R in order.',a:'Survey → Question → Read → Recite → Review'},
+  {ch:5,col:'#3da9fc',q:'What are the 4 factors that set you up for reading comprehension?',a:'1. Know Why You Are Reading · 2. Choose When and Where · 3. Manage Heavy Workloads · 4. Manage Distractions'},
+  {ch:5,col:'#3da9fc',q:'What are the 6 levels of Bloom\'s Taxonomy (bottom to top)?',a:'1. Knowledge → 2. Understanding → 3. Application → 4. Analysis → 5. Synthesis → 6. Evaluation'},
+  {ch:5,col:'#3da9fc',q:'What does CARS stand for in the CARS Test?',a:'Credibility · Accuracy · Reasonableness · Support (Robert Harris\'s system for evaluating internet sources)'},
+  {ch:5,col:'#3da9fc',q:'What is the difference between a primary source and a secondary source?',a:'Primary = original, untranslated documents or works. Secondary = an author\'s interpretation of primary source documents.'},
+  {ch:5,col:'#3da9fc',q:'What is the difference between quotation and paraphrasing?',a:'Quotation = exact words in quotes + reference. Paraphrasing = same idea in YOUR own words, still citing the source.'},
+  {ch:5,col:'#3da9fc',q:'MLA is used for which academic fields? What about APA?',a:'MLA = Humanities (history, literature, arts, philosophy). APA = Social/Behavioural Sciences (psychology, sociology, business, nursing).'},
+  {ch:6,col:'#a78bfa',q:'What is metacognition?',a:'"Thinking about thinking" or "knowing how you know," including taking action based on what you have learned. Foundation for self-knowledge and higher-level thinking skills.'},
+  {ch:6,col:'#a78bfa',q:'What is executive function and when does it develop?',a:'Controlled by the brain\'s prefrontal cortex. Allows perceiving future consequences, weighing pros/cons, and taking risks. Develops most comprehensively between ages 18–25.'},
+  {ch:6,col:'#a78bfa',q:'Define analytical (critical) thinking.',a:'Process of gathering information, breaking it into parts, examining and evaluating those parts, and making connections — for understanding, problem-solving, or decision-making.'},
+  {ch:6,col:'#a78bfa',q:'What are the 5 ingredients of creativity?',a:'1. Belief you can develop creativity · 2. Receptiveness to new ideas · 3. Comfort with time alone · 4. Risk-taking and hard work · 5. Acceptance of mistakes as part of the process'},
+  {ch:6,col:'#a78bfa',q:'What is practical thinking? What is another name for it?',a:'Also called common sense / street smarts / sound judgment. How you adapt to your environment or shape it to suit you, to pursue important goals. Practical thinking = ACTION.'},
+  {ch:6,col:'#a78bfa',q:'What are the 4 components of emotional intelligence?',a:'Receiving emotion · Thinking about emotions · Understanding emotions · Managing emotions'},
+  {ch:6,col:'#a78bfa',q:'What is the key difference between problem solving and decision making?',a:'Problem solving = fix something wrong (identify causes). Decision making = choose among options to reach a goal.'},
+  {ch:7,col:'#2cb67d',q:'What are the 2 pathways through which excessive stress harms health?',a:'1. Increased endocrine activity (cortisol/adrenaline weaken immunity) · 2. Harmful habits (overeating, no sleep, no exercise)'},
+  {ch:7,col:'#2cb67d',q:'What are the 3 core physical health responsibilities from Chapter 7?',a:'1. Pay attention to what you eat · 2. Give priority to exercise · 3. Get enough sleep'},
+  {ch:7,col:'#2cb67d',q:'How is depression defined, and what is the key stat about university students?',a:'Persistent negative mood + loss of interest for at least 2 weeks. ~41% of university students may experience moderate-to-severe depression.'},
+  {ch:7,col:'#2cb67d',q:'Name the 4 anxiety disorder types.',a:'1. GAD (near-constant, no specific cause) · 2. Panic Disorder (sudden attacks + physical symptoms) · 3. PTSD (reliving trauma) · 4. Social Phobia/SAD (fear of social situations)'},
+  {ch:7,col:'#2cb67d',q:'What distinguishes binge eating disorder from bulimia nervosa?',a:'Both involve binge eating episodes with loss of control. Bulimia has compensatory behaviour (vomiting, laxatives). Binge eating disorder does NOT — leading to weight gain.'},
+  {ch:7,col:'#2cb67d',q:'Name Dr. Gregg Jacobs\'s 6 sleep improvement tips.',a:'1. Reduce caffeine · 2. Exercise regularly · 3. Take a short nap when needed · 4. Fixed sleep/wake times · 5. Calm activities before bed · 6. Comfortable, quiet environment'},
+  {ch:8,col:'#f25f4c',q:'What are the 3 types of test anxiety?',a:'1. Cognitive (mental confusion, negative thoughts, fear of failure) · 2. Behavioural (excessive fear, self-blame, anger, depression) · 3. Physiological (racing heart, sweating, nausea, trembling)'},
+  {ch:8,col:'#f25f4c',q:'Explain the Pomodoro Technique.',a:'25 min focused work → 5 min break. After 4 rounds → 20–30 min long break. Developed by Francesco Cirillo. Benefits: focus, less procrastination, less fatigue.'},
+  {ch:8,col:'#f25f4c',q:'What is spaced repetition and how do you apply it?',a:'Review at increasing intervals instead of all at once. Schedule: 10 min → 1 day → 1 week → 1 month. Use Anki or Quizlet. Fixes information in long-term memory.'},
+  {ch:8,col:'#f25f4c',q:'Explain the Feynman Technique.',a:'Explain a concept as if to a small child → identify gaps → refer to source → re-explain simpler. Reveals your true level of understanding and fills knowledge gaps.'},
+  {ch:8,col:'#f25f4c',q:'What are the 5 types of tests by purpose?',a:'Diagnostic · Formative · Quizzes · Midterm Exams · Final Exams'},
+  {ch:8,col:'#f25f4c',q:'What does academic integrity mean beyond not cheating?',a:'An internal ethical commitment. Seeing exams as learning tools, not just grades. Taking responsibility for your own learning. Early training in professional integrity.'},
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+// Track which cards are "checked" (read)
+const cardState = {};
+function stateKey(chNum, si, ci) { return `c${chNum}_s${si}_c${ci}`; }
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('univ101_state') || '{}');
+    Object.assign(cardState, saved);
+  } catch(e) {}
+}
+function saveState() {
+  localStorage.setItem('univ101_state', JSON.stringify(cardState));
+}
+
+// ══════════════════════════════════════════════════════════
+// BUILD CHAPTER HTML
+// ══════════════════════════════════════════════════════════
+function buildChapter(num) {
+  const ch = CHAPTERS[num];
+  const el = document.getElementById(`ch-${num}`);
+  el.style.setProperty('--ch-color', ch.color);
+  el.style.setProperty('--ch-rgb', ch.rgb);
+  el.style.setProperty('--ch-dark', ch.dark);
+  el.style.setProperty('--ch-dark2', ch.dark2);
+
+  let html = `
+    <div class="ch-hero" style="--ch-color:${ch.color};--ch-dark:${ch.dark};--ch-dark2:${ch.dark2}">
+      <div class="ch-hero-label">${ch.label}</div>
+      <div class="ch-hero-title">${ch.title}</div>
+      <div class="ch-hero-meta">${ch.meta}</div>
+      <div class="ch-bar-wrap">
+        <div class="ch-bar-track"><div class="ch-bar-fill" id="bar-${num}" style="background:${ch.color}"></div></div>
+        <div class="ch-bar-pct" style="color:${ch.color}" id="pct-${num}">0%</div>
+      </div>
+    </div>
+    <div class="concepts" style="--ch-color:${ch.color}">
+      <div class="concepts-title">⚡ Key Concepts</div>
+      <div class="concepts-grid">
+        ${ch.concepts.map(c=>`<div class="concept-chip"><strong>${c.h}</strong><span>${c.b}</span></div>`).join('')}
+      </div>
+    </div>`;
+
+  ch.sections.forEach((sec, si) => {
+    const key = stateKey(num, si, 0);
+    const isDone = !!cardState[key];
+    html += `
+      <div class="content-card${isDone?' open':''}" id="card-${num}-${si}" style="--ch-color:${ch.color};--ch-rgb:${ch.rgb}">
+        <div class="card-header" onclick="toggleCard(${num},${si})">
+          <div class="card-icon"><span class="card-icon-inner">${sec.icon}</span></div>
+          <div class="card-title-wrap">
+            <div class="card-title">${sec.title}</div>
+            <div class="card-sub">${sec.sub}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            ${isDone?`<span style="font-size:.7rem;color:${ch.color};">✓</span>`:''}
+            <div class="card-chevron">▼</div>
+          </div>
+        </div>
+        <div class="card-body">${buildCardBody(sec.items, ch.color)}
+          <button class="flashcard-btn" style="--ch-color:${ch.color};--ch-rgb:${ch.rgb}" onclick="markDone(event,${num},${si})">
+            ${isDone?'✓ Marked as reviewed':'Mark section as reviewed ✓'}
+          </button>
+        </div>
+      </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function buildCardBody(items, color) {
+  return items.map(item => {
+    if (item.type === 'term') {
+      return `<div class="term-row">
+        <div class="term-key">${item.key}</div>
+        <div class="term-val">${item.val}</div>
+      </div>`;
+    }
+    if (item.type === 'callout') {
+      return `<div class="callout">${item.val}</div>`;
+    }
+    if (item.type === 'bullets') {
+      return `<ul class="blist">${item.vals.map(v=>`<li>${v}</li>`).join('')}</ul>`;
+    }
+    if (item.type === 'table') {
+      const heads = item.headers.map(h=>`<th>${h}</th>`).join('');
+      const rows = item.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+      return `<div style="overflow-x:auto;margin:.4rem 0"><table class="comp-table"><thead><tr>${heads}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    return '';
+  }).join('');
+}
+
+function toggleCard(chNum, si) {
+  const card = document.getElementById(`card-${chNum}-${si}`);
+  card.classList.toggle('open');
+}
+
+function markDone(e, chNum, si) {
+  e.stopPropagation();
+  const key = stateKey(chNum, si, 0);
+  cardState[key] = true;
+  saveState();
+  const card = document.getElementById(`card-${chNum}-${si}`);
+  const btn = card.querySelector('.flashcard-btn');
+  if (btn) btn.textContent = '✓ Marked as reviewed';
+  // add checkmark to header
+  const chevronWrap = card.querySelector('.card-header > div:last-child');
+  if (chevronWrap && !chevronWrap.querySelector('span')) {
+    const ck = document.createElement('span');
+    ck.style.cssText = `font-size:.7rem;color:${CHAPTERS[chNum].color}`;
+    ck.textContent = '✓';
+    chevronWrap.insertBefore(ck, chevronWrap.firstChild);
+  }
+  updateProgress();
+}
+
+// ══════════════════════════════════════════════════════════
+// PROGRESS
+// ══════════════════════════════════════════════════════════
+function totalSections(chNum) { return CHAPTERS[chNum].sections.length; }
+function doneSections(chNum) {
+  return CHAPTERS[chNum].sections.filter((_,si) => !!cardState[stateKey(chNum,si,0)]).length;
+}
+function totalAll() { return [5,6,7,8].reduce((s,n)=>s+totalSections(n),0); }
+function doneAll() { return [5,6,7,8].reduce((s,n)=>s+doneSections(n),0); }
+
+function updateProgress() {
+  [5,6,7,8].forEach(n => {
+    const done = doneSections(n), total = totalSections(n);
+    const pct = total ? Math.round(done/total*100) : 0;
+    const bar = document.getElementById(`bar-${n}`);
+    const pctEl = document.getElementById(`pct-${n}`);
+    if (bar) bar.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+    // home cards
+    const hBar = document.getElementById(`home-bar-${n}`);
+    const hPct = document.getElementById(`home-pct-${n}`);
+    if (hBar) hBar.style.width = pct + '%';
+    if (hPct) hPct.textContent = pct + '%';
+  });
+  const total = totalAll(), done = doneAll();
+  const pct = total ? Math.round(done/total*100) : 0;
+  // small ring
+  const circ = 2 * Math.PI * 16; // r=16
+  const ring = document.getElementById('globalRing');
+  if (ring) ring.style.strokeDashoffset = circ - (circ * pct / 100);
+  const gPct = document.getElementById('globalPct');
+  if (gPct) gPct.textContent = pct + '%';
+  // big ring
+  const bigCirc = 2 * Math.PI * 45; // r=45
+  const bigFill = document.getElementById('bigRingFill');
+  if (bigFill) bigFill.style.strokeDashoffset = bigCirc - (bigCirc * pct / 100);
+  document.getElementById('bigRingPct').textContent = pct + '%';
+  document.getElementById('bigRingDone').textContent = `${done} / ${total}`;
+  if (pct === 100) setTimeout(()=>document.getElementById('congrats').classList.add('show'), 600);
+}
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+let currentView = 'home';
+let currentChapter = 5;
+
+function switchView(view) {
+  ['home','chapters','search'].forEach(v => {
+    document.getElementById(`view-${v}`).style.display = 'none';
+    const btn = document.getElementById(`bnav-${v}`);
+    if (btn) btn.classList.remove('active');
+  });
+  document.getElementById(`view-${view}`).style.display = 'block';
+  const btn = document.getElementById(`bnav-${view}`);
+  if (btn) btn.classList.add('active');
+  // show/hide chapter tabs
+  document.getElementById('chapterTabs').style.display = view === 'chapters' ? 'flex' : 'none';
+  currentView = view;
+  document.getElementById('scrollArea').scrollTop = 0;
+}
+
+function showChapter(num) {
+  document.querySelectorAll('.chapter-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(`ch-${num}`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.tab[data-ch="${num}"]`).classList.add('active');
+  currentChapter = num;
+  switchView('chapters');
+  document.getElementById('scrollArea').scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════════════════
+// FLASHCARDS
+// ══════════════════════════════════════════════════════════
+let fcDeck = [];
+let fcIndex = 0;
+let fcFlipped = false;
+let fcScore = 0;
+
+function startFlashcards(chFilter) {
+  fcDeck = chFilter ? FLASHCARDS.filter(f=>f.ch===chFilter) : [...FLASHCARDS];
+  // shuffle
+  for (let i = fcDeck.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [fcDeck[i],fcDeck[j]] = [fcDeck[j],fcDeck[i]];
+  }
+  fcIndex = 0; fcScore = 0;
+  document.getElementById('fc-overlay').classList.add('show');
+  renderCard();
+}
+
+function renderCard() {
+  if (fcIndex >= fcDeck.length) {
+    // done
+    document.getElementById('fcQ').textContent = '🎉 Session Complete!';
+    document.getElementById('fcA').textContent = `You got ${fcScore} out of ${fcDeck.length} cards!`;
+    document.getElementById('fcLabel').textContent = 'Done';
+    document.getElementById('fcCard').classList.add('flipped');
+    document.getElementById('fcHint').style.display = 'none';
+    document.getElementById('fcCounter').textContent = `${fcDeck.length} / ${fcDeck.length}`;
+    document.getElementById('fcProgFill').style.width = '100%';
+    return;
+  }
+  const card = fcDeck[fcIndex];
+  fcFlipped = false;
+  const el = document.getElementById('fcCard');
+  el.classList.remove('flipped');
+  el.style.setProperty('--fc-color', card.col);
+  document.getElementById('fcLabel').textContent = `Chapter ${card.ch}`;
+  document.getElementById('fcQ').textContent = card.q;
+  document.getElementById('fcA').textContent = card.a;
+  document.getElementById('fcCounter').textContent = `${fcIndex+1} / ${fcDeck.length}`;
+  document.getElementById('fcHint').style.display = 'block';
+  document.getElementById('fcHint').textContent = 'Tap card to reveal answer';
+  const pct = (fcIndex / fcDeck.length) * 100;
+  document.getElementById('fcProgFill').style.width = pct + '%';
+}
+
+function flipCard() {
+  if (fcIndex >= fcDeck.length) return;
+  fcFlipped = !fcFlipped;
+  document.getElementById('fcCard').classList.toggle('flipped', fcFlipped);
+  document.getElementById('fcHint').textContent = fcFlipped ? 'Did you get it right?' : 'Tap card to reveal answer';
+}
+
+function nextCard(correct) {
+  if (fcIndex >= fcDeck.length) { closeFlashcards(); return; }
+  if (correct) fcScore++;
+  fcIndex++;
+  renderCard();
+}
+
+function closeFlashcards() {
+  document.getElementById('fc-overlay').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════════════
+// Build search index
+const searchIndex = [];
+[5,6,7,8].forEach(num => {
+  const ch = CHAPTERS[num];
+  ch.sections.forEach((sec, si) => {
+    sec.items.forEach(item => {
+      if (item.type === 'term') {
+        searchIndex.push({ch:num, chTitle:ch.title, color:ch.color,
+          title:item.key, body:item.val, si});
+      }
+      if (item.type === 'callout') {
+        searchIndex.push({ch:num, chTitle:ch.title, color:ch.color,
+          title:sec.title, body:item.val, si});
+      }
+    });
+  });
+});
+
+function doSearch(q) {
+  const res = document.getElementById('searchResults');
+  if (!q.trim()) { res.innerHTML = '<div class="search-empty">Type to search across all chapters</div>'; return; }
+  const lower = q.toLowerCase();
+  const matches = searchIndex.filter(e =>
+    e.title.toLowerCase().includes(lower) || e.body.toLowerCase().includes(lower)
+  ).slice(0, 20);
+  if (!matches.length) { res.innerHTML = '<div class="search-empty">No results found</div>'; return; }
+  res.innerHTML = matches.map(m => {
+    const hi = (t) => t.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
+      s=>`<span class="sr-highlight">${s}</span>`);
+    const snippet = m.body.length > 120 ? m.body.substring(0,120)+'…' : m.body;
+    return `<div class="search-result" onclick="switchView('chapters');showChapter(${m.ch});">
+      <div class="sr-chapter" style="color:${m.color}">Chapter ${m.ch} — ${m.chTitle}</div>
+      <div class="sr-title">${hi(m.title)}</div>
+      <div class="sr-snippet">${hi(snippet)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// RESET
+// ══════════════════════════════════════════════════════════
+function resetProgress() {
+  if (!confirm('Reset all progress?')) return;
+  localStorage.removeItem('univ101_state');
+  Object.keys(cardState).forEach(k => delete cardState[k]);
+  // Re-build chapters to reset UI
+  [5,6,7,8].forEach(buildChapter);
+  updateProgress();
+}
+
+// ══════════════════════════════════════════════════════════
+// PWA — Service Worker & Install
+// ══════════════════════════════════════════════════════════
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => document.getElementById('install-toast').classList.add('show'), 2000);
+});
+document.getElementById('installBtn').addEventListener('click', () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('install-toast').classList.remove('show');
+  });
+});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+loadState();
+[5,6,7,8].forEach(buildChapter);
+updateProgress();
+showChapter(5); // pre-build
+switchView('home');
+</script>
+</body>
+</html>
