@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -396,6 +397,59 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .toast-btn{background:var(--gold);color:#0c0b14;border:none;border-radius:8px;
   padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;}
 .toast-close{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:.2rem;}
+/* ── Quiz View ── */
+.qz-hero{background:linear-gradient(135deg,#1a0810,#2a0e20);border:1px solid var(--c8);
+  border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.qz-hero::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;
+  border-radius:50%;background:var(--c8);opacity:.07;}
+.qz-hero-label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--c8);margin-bottom:.3rem;}
+.qz-hero-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:.25rem;}
+.qz-hero-sub{font-size:.75rem;color:rgba(255,255,255,.5);}
+.qz-filters{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem;}
+.qzf-btn{font-size:.75rem;font-weight:600;padding:.35rem .85rem;border-radius:8px;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;}
+.qzf-btn.active{border-color:var(--gold);color:var(--gold);background:#1e1608;}
+.qz-start-btn{width:100%;padding:.75rem;border-radius:12px;border:none;
+  background:var(--c8);color:#fff;font-family:'Fraunces',serif;font-size:1rem;
+  font-weight:700;cursor:pointer;margin-bottom:1rem;letter-spacing:.01em;}
+.qz-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.qz-counter{font-size:.75rem;color:var(--muted);}
+.qz-badge{font-size:.65rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;
+  border:1px solid;letter-spacing:.05em;}
+.qz-prog-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:1rem;}
+.qz-prog-fill{height:100%;border-radius:99px;transition:width .4s ease;background:var(--c8);}
+.qz-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem;}
+.qz-chapter-lbl{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;}
+.qz-question{font-size:.92rem;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:1rem;}
+.qz-options{display:flex;flex-direction:column;gap:.45rem;}
+.qz-opt{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:.65rem .85rem;font-size:.82rem;color:var(--text);cursor:pointer;text-align:left;
+  line-height:1.4;transition:border-color .15s,background .15s;font-family:'DM Sans',sans-serif;}
+.qz-opt:hover:not(:disabled){border-color:#3a3758;}
+.qz-opt.correct{background:#0d1e18;border-color:var(--green);color:var(--green);}
+.qz-opt.wrong{background:#1e0d0b;border-color:var(--accent2);color:var(--accent2);}
+.qz-opt.reveal{background:#0d1e18;border-color:var(--green);color:var(--green);}
+.qz-opt:disabled{cursor:default;}
+.qz-feedback{font-size:.78rem;line-height:1.5;margin-top:.75rem;padding:.65rem .85rem;
+  border-radius:9px;display:none;}
+.qz-feedback.ok{display:block;background:#0d1e18;color:var(--green);}
+.qz-feedback.bad{display:block;background:#1e0d0b;color:#f4847a;}
+.qz-next-btn{margin-top:.75rem;width:100%;padding:.65rem;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;}
+.qz-res-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem;text-align:center;}
+.qz-res-emoji{font-size:2.5rem;margin-bottom:.4rem;}
+.qz-res-score{font-family:'Fraunces',serif;font-size:2.8rem;font-weight:900;color:var(--gold);margin-bottom:.2rem;}
+.qz-res-label{font-size:.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.4;}
+.qz-res-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;}
+.qz-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.65rem;}
+.qz-stat-n{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:900;margin-bottom:.1rem;}
+.qz-stat-l{font-size:.68rem;color:var(--muted);}
+.qz-restart-btn{width:100%;padding:.65rem;border-radius:10px;background:var(--surface);
+  border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.85rem;font-weight:600;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -485,6 +539,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <button class="action-btn primary" onclick="startFlashcards()">
           <span class="action-icon">🃏</span> Start Flashcard Session (All Chapters)
         </button>
+        <button class="action-btn" onclick="switchView('quiz')" style="background:var(--c8);border-color:var(--c8);color:#fff;">
+          <span class="action-icon">📝</span> Take the Chapter Quiz
+        </button>
         <button class="action-btn" onclick="resetProgress()">
           <span class="action-icon">↺</span> Reset All Progress
         </button>
@@ -505,6 +562,58 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="ch-6" class="chapter-view"></div>
       <div id="ch-7" class="chapter-view"></div>
       <div id="ch-8" class="chapter-view"></div>
+    </div>
+
+    <!-- QUIZ VIEW -->
+    <div id="view-quiz" style="display:none;">
+      <div id="qz-filter-area">
+        <div class="qz-hero">
+          <div class="qz-hero-label">30 Questions</div>
+          <div class="qz-hero-title">Chapter Quiz</div>
+          <div class="qz-hero-sub">Test yourself on all 4 chapters</div>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem;">Filter by chapter:</p>
+        <div class="qz-filters">
+          <button class="qzf-btn active" data-ch="all" onclick="qzSetFilter('all',this)">All</button>
+          <button class="qzf-btn" data-ch="5" onclick="qzSetFilter('5',this)" style="color:var(--c5);">Ch 5</button>
+          <button class="qzf-btn" data-ch="6" onclick="qzSetFilter('6',this)" style="color:var(--c6);">Ch 6</button>
+          <button class="qzf-btn" data-ch="7" onclick="qzSetFilter('7',this)" style="color:var(--c7);">Ch 7</button>
+          <button class="qzf-btn" data-ch="8" onclick="qzSetFilter('8',this)" style="color:var(--c8);">Ch 8</button>
+        </div>
+        <button class="qz-start-btn" onclick="qzStart()">Start Quiz ›</button>
+      </div>
+
+      <div id="qz-area" style="display:none;">
+        <div class="qz-toprow">
+          <span class="qz-counter" id="qzCounter">1 / 30</span>
+          <span class="qz-badge" id="qzBadge"></span>
+        </div>
+        <div class="qz-prog-bar"><div class="qz-prog-fill" id="qzProgFill"></div></div>
+        <div class="qz-card">
+          <div class="qz-chapter-lbl" id="qzChLbl"></div>
+          <div class="qz-question" id="qzText"></div>
+          <div class="qz-options" id="qzOptions"></div>
+          <div class="qz-feedback" id="qzFeedback"></div>
+          <button class="qz-next-btn" id="qzNextBtn" onclick="qzNext()" style="display:none;">Next →</button>
+        </div>
+      </div>
+
+      <div id="qz-results" style="display:none;">
+        <div class="qz-res-card">
+          <div class="qz-res-emoji">🎓</div>
+          <div class="qz-res-score" id="qzResScore"></div>
+          <div class="qz-res-label" id="qzResLabel"></div>
+          <div class="qz-res-grid">
+            <div class="qz-stat"><div class="qz-stat-n" id="qzResCorrect" style="color:var(--green)"></div><div class="qz-stat-l">Correct</div></div>
+            <div class="qz-stat"><div class="qz-stat-n" id="qzResWrong" style="color:var(--accent2)"></div><div class="qz-stat-l">Wrong</div></div>
+            <div class="qz-stat"><div class="qz-stat-n" id="qzResCh5" style="color:var(--c5)"></div><div class="qz-stat-l">Ch 5</div></div>
+            <div class="qz-stat"><div class="qz-stat-n" id="qzResCh6" style="color:var(--c6)"></div><div class="qz-stat-l">Ch 6</div></div>
+            <div class="qz-stat"><div class="qz-stat-n" id="qzResCh7" style="color:var(--c7)"></div><div class="qz-stat-l">Ch 7</div></div>
+            <div class="qz-stat"><div class="qz-stat-n" id="qzResCh8" style="color:var(--c8)"></div><div class="qz-stat-l">Ch 8</div></div>
+          </div>
+          <button class="qz-restart-btn" onclick="qzRestart()">Try Again ↺</button>
+        </div>
+      </div>
     </div>
 
     <!-- SEARCH VIEW -->
@@ -529,7 +638,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span class="bnav-icon">📖</span>Chapters
     </button>
     <button class="bnav-item" id="bnav-flashcards" onclick="startFlashcards()">
-      <span class="bnav-icon">🃏</span>Flashcards
+      <span class="bnav-icon">🃏</span>Cards
+    </button>
+    <button class="bnav-item" id="bnav-quiz" onclick="switchView('quiz')">
+      <span class="bnav-icon">📝</span>Quiz
     </button>
     <button class="bnav-item" id="bnav-search" onclick="switchView('search')">
       <span class="bnav-icon">🔍</span>Search
@@ -1032,7 +1144,7 @@ let currentView = 'home';
 let currentChapter = 5;
 
 function switchView(view) {
-  ['home','chapters','search'].forEach(v => {
+  ['home','chapters','search','quiz'].forEach(v => {
     document.getElementById(`view-${v}`).style.display = 'none';
     const btn = document.getElementById(`bnav-${v}`);
     if (btn) btn.classList.remove('active');
@@ -1040,7 +1152,6 @@ function switchView(view) {
   document.getElementById(`view-${view}`).style.display = 'block';
   const btn = document.getElementById(`bnav-${view}`);
   if (btn) btn.classList.add('active');
-  // show/hide chapter tabs
   document.getElementById('chapterTabs').style.display = view === 'chapters' ? 'flex' : 'none';
   currentView = view;
   document.getElementById('scrollArea').scrollTop = 0;
@@ -1172,6 +1283,135 @@ function resetProgress() {
   // Re-build chapters to reset UI
   [5,6,7,8].forEach(buildChapter);
   updateProgress();
+}
+
+// ══════════════════════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════════════════════
+const QZ_ALL = [
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'According to Johnson (2008), reading is best described as:',opts:['A passive activity of receiving information','An interactive model of communication requiring engagement with the author\'s ideas','A method of memorising facts','A technique for improving vocabulary'],a:1,exp:'Reading is defined as an interactive model of communication where true learning emerges from engagement with the author\'s ideas.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'What is the correct order of the SQ3R reading system?',opts:['Survey, Question, Read, Recite, Review','Survey, Read, Question, Review, Recite','Question, Survey, Read, Recite, Review','Read, Survey, Question, Recite, Review'],a:0,exp:'SQ3R = Survey → Question → Read → Recite → Review. This order is fixed and each step builds on the previous one.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'Which level of Bloom\'s Taxonomy involves making decisions about the validity of ideas?',opts:['Knowledge','Application','Synthesis','Evaluation'],a:3,exp:'Evaluation (Level 6) is the highest level — it involves making decisions about different ideas and their validity.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'In the CARS Test, what does the "R" stand for?',opts:['Relevance','Reliability','Reasonableness','Research'],a:2,exp:'CARS = Credibility, Accuracy, Reasonableness, Support. Reasonableness refers to fairness, balance, and objectivity.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'A letter written by a historical figure is an example of:',opts:['A secondary source','A tertiary source','A primary source','An academic source'],a:2,exp:'Primary sources are original, untranslated documents or works — including letters, photographs, journals, and recordings.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'What is the key difference between quotation and paraphrasing?',opts:['Quotation requires a reference but paraphrasing does not','Quotation uses exact words with a reference; paraphrasing rewrites in your own words but still cites','Paraphrasing is always longer than the original','Both use the author\'s exact words'],a:1,exp:'Quotation = exact words in quotes + reference. Paraphrasing = same meaning in YOUR own words + citation. Both require acknowledgement of the source.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'APA citation style is most appropriate for which field?',opts:['History','Philosophy','Literature','Psychology'],a:3,exp:'APA is used in Social and Behavioural Sciences (psychology, sociology, business, nursing). MLA is used in the Humanities.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'Which SQ3R step involves speaking answers aloud after each section?',opts:['Survey','Question','Recite','Review'],a:2,exp:'Recite (Step 4) — after reading a section, recite answers to your Q-stage questions. Speaking or writing anchors material in the brain.'},
+  {ch:5,col:'#3da9fc',label:'Ch 5 — Reading',q:'Which is NOT one of the 4 factors for reading comprehension?',opts:['Managing distractions','Choosing when and where to read','Memorising key terms before reading','Managing heavy workloads'],a:2,exp:'The 4 factors: Know Why You Are Reading, Choose When and Where, Manage Heavy Workloads, Manage Distractions. Memorising terms is not one.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'Metacognition is best defined as:',opts:['The ability to memorise large amounts of information','Thinking about thinking, or knowing how you know','Creative problem solving','Applying knowledge to real-world situations'],a:1,exp:'Metacognition = "thinking about thinking" or "knowing how you know." Foundation for self-knowledge and higher-level thinking skills.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'At approximately what age does the brain\'s prefrontal cortex complete its most comprehensive development?',opts:['14–16','16–18','18–25','25–30'],a:2,exp:'The prefrontal cortex — which controls executive function — undergoes its last and most comprehensive development from around ages 18–25.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'Which of the following is a step in analytical thinking?',opts:['Break information into main idea and supporting evidence','Accept all information without questioning','Focus only on creative solutions','Memorise the conclusions of others'],a:0,exp:'Analytical thinking: Gather information → Break into main idea + evidence → Examine & evaluate → Make connections.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'"My mother\'s cooking is the best in the world" is an example of:',opts:['A fact','An opinion','An analysis','A primary source'],a:1,exp:'This is an opinion — it is subjective and cannot be verified. A fact is something verifiable like a date or event.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'Which is one of the 5 ingredients of creativity?',opts:['Avoiding all mistakes','Comfort with time alone','Relying on others for ideas','Sticking to familiar approaches'],a:1,exp:'The 5 ingredients: Belief you can develop creativity, Receptiveness to new ideas, Comfort with time alone, Risk-taking and hard work, Acceptance of mistakes.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'Practical thinking is also known as:',opts:['Abstract reasoning','Theoretical analysis','Common sense or street smarts','Logical deduction'],a:2,exp:'Practical thinking is also called common sense, street smarts, or sound judgment. It refers to how you adapt to your environment to pursue important goals.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'What is the key difference between problem solving and decision making?',opts:['Problem solving has more steps','Problem solving fixes something wrong; decision making chooses among options to reach a goal','Decision making is always more complex','They are the same process'],a:1,exp:'Problem solving = identify and fix what is wrong. Decision making = choose among available options to achieve a goal.'},
+  {ch:6,col:'#a78bfa',label:'Ch 6 — Thinking',q:'Which component is NOT part of emotional intelligence?',opts:['Receiving emotion','Managing emotions','Memorising emotions','Understanding emotions'],a:2,exp:'The 4 components: Receiving, Thinking about, Understanding, and Managing emotions. "Memorising" is not one of them.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'Excessive stress harms health through two main pathways. Which is one of them?',opts:['Improved memory function','Increased endocrine gland activity releasing cortisol and adrenaline','Better immune system performance','Reduced inflammation'],a:1,exp:'Pathway 1: Stress releases cortisol and adrenaline. Chronically elevated levels weaken the immune system and increase inflammation.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'Approximately what percentage of university students may experience moderate to severe depression?',opts:['21%','31%','41%','51%'],a:2,exp:'Research indicates that around 41% of university students may experience moderate to severe depression at some point in their university life.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'Which is NOT one of the 3 core physical health responsibilities from Chapter 7?',opts:['Pay attention to what you eat','Give priority to exercise','Avoid all social interaction','Get enough sleep'],a:2,exp:'The 3 responsibilities: Pay attention to what you eat, Give priority to exercise, Get enough sleep.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'GAD (Generalised Anxiety Disorder) is best described as:',opts:['Sudden panic attacks with physical symptoms','Near-constant anxiety not linked to a specific cause','Intense fear of social situations','Reliving traumatic events with isolation'],a:1,exp:'GAD is a near-constant anxiety disorder not linked to a specific cause, and which is difficult to control.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'Which eating disorder involves binge eating WITHOUT compensatory behaviours like purging?',opts:['Anorexia nervosa','Bulimia nervosa','Binge eating disorder','Social eating disorder'],a:2,exp:'Binge eating disorder is the most common eating disorder. Unlike bulimia, it involves no compensatory behaviours — leading to weight gain.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'Which is a sign of sleep deprivation mentioned in the slides?',opts:['Feeling energetic in the morning','Falling asleep during lectures','Needing less caffeine','Improved concentration'],a:1,exp:'Signs of sleep deprivation: feeling groggy in the morning, falling asleep during lectures, and relying on caffeine to get through the day.'},
+  {ch:7,col:'#2cb67d',label:'Ch 7 — Health',q:'Which of Dr. Gregg Jacobs\'s tips helps improve sleep quality?',opts:['Drinking coffee before bed','Adhering to fixed sleep and wake-up times','Using your phone in bed','Exercising right before sleeping'],a:1,exp:'Dr. Jacobs recommends: reduce caffeine, exercise, short naps, fixed sleep/wake times, calm activities before bed, quiet environment.'},
+  {ch:8,col:'#f25f4c',label:'Ch 8 — Tests',q:'Which type of test determines a student\'s initial level BEFORE teaching begins?',opts:['Formative test','Midterm exam','Diagnostic test','Standardised test'],a:2,exp:'Diagnostic tests determine the student\'s initial level and identify strengths and weaknesses before starting teaching.'},
+  {ch:8,col:'#f25f4c',label:'Ch 8 — Tests',q:'What are the 3 types of test anxiety?',opts:['Physical, Emotional, Behavioural','Cognitive, Behavioural, Physiological','Mental, Social, Academic','Stress, Worry, Panic'],a:1,exp:'The 3 types: Cognitive (negative thoughts, confusion), Behavioural (excessive fear, self-blame), Physiological (racing heart, sweating, nausea).'},
+  {ch:8,col:'#f25f4c',label:'Ch 8 — Tests',q:'The Pomodoro Technique was developed by:',opts:['Benjamin Bloom','Francesco Cirillo','Robert Harris','Gregg Jacobs'],a:1,exp:'The Pomodoro Technique was developed by the Italian Francesco Cirillo. 25-minute focused sessions followed by 5-minute breaks.'},
+  {ch:8,col:'#f25f4c',label:'Ch 8 — Tests',q:'Which technique involves explaining a concept as if teaching it to a small child to reveal knowledge gaps?',opts:['Spaced repetition','Memory Palace','Active recall','Feynman Technique'],a:3,exp:'The Feynman Technique: Explain simply → identify unclear parts → refer to source → re-explain simpler. Reveals your true level of understanding.'},
+  {ch:8,col:'#f25f4c',label:'Ch 8 — Tests',q:'What does academic integrity mean beyond not cheating?',opts:['Getting the highest grade by any means','An internal ethical commitment — seeing exams as learning tools, not just grades','Following only the rules your professor sets','Submitting work on time'],a:1,exp:'Academic integrity is an internal ethical commitment. An honest student sees an exam as an opportunity to measure their true level.'},
+  {ch:8,col:'#f25f4c',label:'Ch 8 — Tests',q:'During a test, what should you do with questions you are uncertain about?',opts:['Skip them entirely','Mark them for later reference and come back','Guess immediately and move on','Ask your classmate'],a:1,exp:'Mark uncertain questions for later reference. Keep moving, secure easier marks first, then return with more time and focus.'},
+];
+
+let qzDeck=[],qzIdx=0,qzScore=0,qzAnswered=false,qzActiveFilter='all';
+let qzChScores={5:{c:0,t:0},6:{c:0,t:0},7:{c:0,t:0},8:{c:0,t:0}};
+
+function qzSetFilter(ch,btn){
+  qzActiveFilter=ch;
+  document.querySelectorAll('.qzf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function qzShuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function qzStart(){
+  const filtered=qzActiveFilter==='all'?QZ_ALL:QZ_ALL.filter(q=>q.ch==qzActiveFilter);
+  qzDeck=qzShuffle(filtered);
+  qzIdx=0;qzScore=0;qzAnswered=false;
+  qzChScores={5:{c:0,t:0},6:{c:0,t:0},7:{c:0,t:0},8:{c:0,t:0}};
+  document.getElementById('qz-filter-area').style.display='none';
+  document.getElementById('qz-area').style.display='block';
+  document.getElementById('qz-results').style.display='none';
+  qzRender();
+}
+function qzRender(){
+  if(qzIdx>=qzDeck.length){qzShowResults();return;}
+  qzAnswered=false;
+  const q=qzDeck[qzIdx];
+  document.getElementById('qzCounter').textContent=`${qzIdx+1} / ${qzDeck.length}`;
+  const badge=document.getElementById('qzBadge');
+  badge.textContent=q.label;badge.style.color=q.col;badge.style.borderColor=q.col;
+  document.getElementById('qzChLbl').textContent=q.label;
+  document.getElementById('qzChLbl').style.color=q.col;
+  document.getElementById('qzText').textContent=q.q;
+  const pct=Math.round((qzIdx/qzDeck.length)*100);
+  const fill=document.getElementById('qzProgFill');
+  fill.style.width=pct+'%';fill.style.background=q.col;
+  const opts=document.getElementById('qzOptions');
+  opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='qz-opt';btn.textContent=o;
+    btn.onclick=()=>qzAnswer(i,q);
+    opts.appendChild(btn);
+  });
+  document.getElementById('qzFeedback').className='qz-feedback';
+  document.getElementById('qzFeedback').textContent='';
+  document.getElementById('qzNextBtn').style.display='none';
+}
+function qzAnswer(i,q){
+  if(qzAnswered)return;
+  qzAnswered=true;
+  qzChScores[q.ch].t++;
+  const btns=document.querySelectorAll('.qz-opt');
+  btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('qzFeedback');
+  if(i===q.a){
+    qzScore++;qzChScores[q.ch].c++;
+    btns[i].classList.add('correct');
+    fb.textContent='✓ Correct! '+q.exp;
+    fb.className='qz-feedback ok';
+  }else{
+    btns[i].classList.add('wrong');
+    btns[q.a].classList.add('reveal');
+    fb.textContent='✗ Not quite. '+q.exp;
+    fb.className='qz-feedback bad';
+  }
+  document.getElementById('qzNextBtn').style.display='block';
+}
+function qzNext(){
+  qzIdx++;
+  document.getElementById('scrollArea').scrollTop=0;
+  qzRender();
+}
+function qzShowResults(){
+  document.getElementById('qz-area').style.display='none';
+  document.getElementById('qz-results').style.display='block';
+  const pct=Math.round((qzScore/qzDeck.length)*100);
+  document.getElementById('qzResScore').textContent=pct+'%';
+  const labels=['Needs more revision 📚','Keep studying! 💪','Good effort! 👍','Well done! ⭐','Excellent! 🏆'];
+  document.getElementById('qzResLabel').textContent=`${qzScore} / ${qzDeck.length} correct — ${labels[Math.min(4,Math.floor(pct/20))]}`;
+  document.getElementById('qzResCorrect').textContent=qzScore;
+  document.getElementById('qzResWrong').textContent=qzDeck.length-qzScore;
+  [5,6,7,8].forEach(c=>{
+    const s=qzChScores[c];
+    document.getElementById('qzResCh'+c).textContent=s.t>0?Math.round((s.c/s.t)*100)+'%':'—';
+  });
+}
+function qzRestart(){
+  document.getElementById('qz-results').style.display='none';
+  document.getElementById('qz-filter-area').style.display='block';
+  document.getElementById('scrollArea').scrollTop=0;
 }
 
 // ══════════════════════════════════════════════════════════
